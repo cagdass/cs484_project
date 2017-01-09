@@ -1,18 +1,19 @@
 % Number of images in the data set.
-num_img = 188;
+num_img = 20;
 
 % Will keep the count of total number of objects.
 num_obj = 0;
+train_num_obj = 0;
 % Number of object types.
 num_obj_type = 8;
 
 % Step value for dense sampling.
-step_ = 6;
+step_ = 10;
 % Size value for dense sampling.
 size_ = 8;
 
 % Number of clusters for kmeans.
-num_clusters = 1000;
+num_clusters = 500;
 
 % Images in the data set.
 images = cell(num_img,1);
@@ -29,7 +30,7 @@ object_counts = zeros(num_img, 1);
 % Total number of descriptors.
 total_descriptors = 0;
 
-object_types = {'computer screen', 'keyboard', 'mouse', 'mug', 'car', 'tree', 'person', 'building'};
+object_types = {'screen', 'keyboard', 'mouse', 'mug', 'car', 'tree', 'person', 'building'};
 % 1: computer screen
 % 2: keyboard
 % 3: mouse
@@ -39,6 +40,13 @@ object_types = {'computer screen', 'keyboard', 'mouse', 'mug', 'car', 'tree', 'p
 % 7: person
 % 8: building
 object_total = [90, 88, 77, 43, 53, 68, 33, 92];
+train_object_total = zeros(num_obj_type, 1);
+
+train_ratio = 0.5;
+test_ratio = 0.5;
+valid_ratio = 0;
+[train_ind, valid_ind, test_ind] = dividerand(num_img, train_ratio, valid_ratio, test_ratio);
+
 
 % Read the images and the masks for each image.
 % Create descriptors for each image using dense sampling.
@@ -59,7 +67,25 @@ for i = 1:num_img
     
     object_counts(i) = length(masks{i}.masks);
     num_obj = num_obj + object_counts(i);
+    if ~isempty(find(train_ind == i,1))
+        cur = masks{i}.masks;
+        for j = 1:length(cur)
+            cur_object_name = cur(j).class_name;
+            cur_index = 0;
+            % Find the index of the current object's type.
+            for k = 1:num_obj_type
+                if strcmp(cur_object_name, object_types{k})
+                    cur_index = k;
+                    break
+                end
+            end
+            train_object_total(cur_index) = train_object_total(cur_index) + 1;
+            train_num_obj = train_num_obj + 1;
+        end
+    end
 end
+
+
 
 % Simple function to draw points on whence the descriptors are obtained.
 % dsift_img = get_dsift_labels(images{1}, frames);
@@ -76,52 +102,38 @@ for i = 1:num_img
     count = count + tmp;
 end
 
-% Apply kmeans. Centers is the centroid of each cluster.
-% Labels is the respective cluster each descriptor belongs to.
+% Apply kmeans clustering. centers is a vector of coordinates of the centroid of each cluster.
+% labels is the respective cluster each descriptor belongs to.
 [centers, labels] = vl_kmeans(all_descriptors, num_clusters);
 
-% @TODO change the following code to have histograms for each individual
-% object.
-histograms = cell(num_img, 1);
-% Create a histogram for each image using the kmeans results.
-for i = 1:num_img
-    % Start and end indices for the current image.
-    start_index = sum(descriptor_counts(1:i-1));
-    if start_index == 0
-        start_index = 1;
-    end
-    end_index = start_index + descriptor_counts(i);
-    [histogram, edges] = histcounts(labels(start_index:end_index));
-    histograms{i} = histogram;
-end
+% Histograms for each object in the training set.
+object_histograms = zeros(train_num_obj, num_clusters);
 
-% Histograms for each object.
-object_histograms = zeros(num_obj, num_clusters);
-
-% Histograms for the objects of each object type.
+% Histograms for the objects of each object type in the training set.
 % Follows the indexing scheme from above.
 histograms = cell(num_obj_type, 1);
 for i = 1:num_obj_type
-    histograms{i} = zeros(object_total(i), num_clusters);
+    histograms{i} = zeros(train_object_total(i), num_clusters);
 end
 
 % Counts of how many objects of certain types have been found.
-cur_counts = ones(num_obj_type);
+cur_counts = zeros(num_obj_type, 1);
 
 % Count of which object this is.
-cur_obj_count = 1;
+cur_obj_count = 0;
 
-% Iterate through each image.
-for i = 1:num_img
+% Iterate through each image in the training set.
+for c_i = 1:length(train_ind)
+    i = train_ind(c_i);
     % Mask and frame of the current image.
     cur_mask = masks{i};
     cur_frame = frames{i};
     % Iterate through each object in the current image.
     for j = 1:object_counts(i,1)
         % Mask for the current ojbect.
-        cur_object_mask = cur_mask.masks.mask;
+        cur_object_mask = cur_mask.masks(j).mask;
         % Current object's class name
-        cur_object_name = cur_mask.masks.class_name;
+        cur_object_name = cur_mask.masks(j).class_name;
         
         cur_index = 0;
         % Find the index of the current object's type.
@@ -132,11 +144,15 @@ for i = 1:num_img
             end
         end
         
+        cur_counts(cur_index) = cur_counts(cur_index) + 1;
+        cur_obj_count = cur_obj_count + 1;
+        
         % Base index for the first descriptor in this image.
         base_index = sum(descriptor_counts(1:i-1));
         
         % Iterate through this image's descriptors.
-        for k = 1:descriptor_counts(i)
+        k = 1;
+        while k < descriptor_counts(i)
             x = cur_frame(k);
             y = cur_frame(k+1);
             if cur_object_mask(x,y) == 1
@@ -150,9 +166,11 @@ for i = 1:num_img
                 cc = cur_counts(cur_index);
                 histograms{cur_index}(cc, cur_label) = histograms{cur_index}(cc, cur_label) + 1;
             end
+            
+            % Increment k by 2.
+            k = k + 2;
         end  
-        
-        cur_counts(cur_index) = cur_counts(cur_index) + 1;
-        cur_obj_count = cur_obj_count + 1;
     end
 end
+
+
