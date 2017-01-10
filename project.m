@@ -40,8 +40,10 @@ object_types = {'screen', 'keyboard', 'mouse', 'mug', 'car', 'tree', 'person', '
 % 7: person
 % 8: building
 object_total = [90, 88, 77, 43, 53, 68, 33, 92];
+% Total number of objects by type in the training set.
 train_object_total = zeros(num_obj_type, 1);
 
+% Ratios of training and test set, to be divided randomly.
 train_ratio = 0.5;
 test_ratio = 0.5;
 valid_ratio = 0;
@@ -85,7 +87,12 @@ for i = 1:num_img
     end
 end
 
-
+% Training data labels for each object type.
+% Binary labels for each object.
+train_labels = cell(num_obj_type, 1);
+for i = 1:num_obj_type
+    train_labels{i} = zeros(train_num_obj, 1);
+end
 
 % Simple function to draw points on whence the descriptors are obtained.
 % dsift_img = get_dsift_labels(images{1}, frames);
@@ -147,6 +154,10 @@ for c_i = 1:length(train_ind)
         cur_counts(cur_index) = cur_counts(cur_index) + 1;
         cur_obj_count = cur_obj_count + 1;
         
+        % Mark the corresponding class name's label as 1 for the current
+        % object.
+        train_labels{cur_index}(cur_obj_count) = 1;
+        
         % Base index for the first descriptor in this image.
         base_index = sum(descriptor_counts(1:i-1));
         
@@ -162,7 +173,7 @@ for c_i = 1:length(train_ind)
                 % histogram.
                 object_histograms(cur_obj_count, cur_label) = temp + 1;
                 
-                % Find the count of the current object type so far;
+                % Find the count of the current object type so far; 
                 cc = cur_counts(cur_index);
                 histograms{cur_index}(cc, cur_label) = histograms{cur_index}(cc, cur_label) + 1;
             end
@@ -173,4 +184,11 @@ for c_i = 1:length(train_ind)
     end
 end
 
+models = cell(num_obj_type, 1);
+% Train binary SVM classifiers for each object type.
+for i = 1:num_obj_type
+    cur_model = fitcsvm(object_histograms, train_labels{i}, 'BoxConstraint', 1, 'KernelFunction', 'polynomial');
+end
 
+% Predict a given test example
+[label, score] = predict(cur_model, object_histograms(13:24);
