@@ -52,10 +52,10 @@ test_ratio = 0.5;
 valid_ratio = 0;
 [train_ind, valid_ind, test_ind] = dividerand(num_img, train_ratio, valid_ratio, test_ratio);
 
-
 % Read the images and the masks for each image.
 % Create descriptors for each image using dense sampling.
 for i = 1:num_img
+    fprintf('Loop %d iteration %d\n', 1, i);
     % Read the masks.
     masks{i} = load(strcat('data/', num2str(i), '.mat'));
     % Read the images.
@@ -79,25 +79,28 @@ for i = 1:num_img
     
     object_counts(i) = length(masks{i}.masks);
     num_obj = num_obj + object_counts(i);
-    if ~isempty(find(train_ind == i,1))
-        cur = masks{i}.masks;
-        for j = 1:length(cur)
-            cur_object_name = cur(j).class_name;
-            cur_index = 0;
-            % Find the index of the current object's type.
-            for k = 1:num_obj_type
-                if strcmp(cur_object_name, object_types{k})
-                    cur_index = k;
-                    break
-                end
+    
+    cur = masks{i}.masks;
+    for j = 1:length(cur)
+        cur_object_name = cur(j).class_name;
+        cur_index = 0;
+        % Find the index of the current object's type.
+        for k = 1:num_obj_type
+            if strcmp(cur_object_name, object_types{k})
+                cur_index = k;
+                break
             end
-            better_masks{i, cur_index} = (better_masks{i, cur_index} | cur(j).mask);
+        end
+        b = better_masks{i, cur_index};
+        a = cur(j).mask;
+        better_masks{i, cur_index} = (a|b);
+        if ~isempty(find(train_ind == i,1))
             train_object_total(cur_index) = train_object_total(cur_index) + 1;
             train_num_obj = train_num_obj + 1;
         end
     end
 end
-
+% 
 % Training data labels for each object type.
 % Binary labels for each object.
 train_labels = cell(num_obj_type, 1);
@@ -142,6 +145,7 @@ cur_obj_count = 0;
 
 % Iterate through each image in the training set.
 for c_i = 1:length(train_ind)
+    fprintf('Loop %d iteration %d\n', 2, c_i);
     i = train_ind(c_i);
     % Mask and frame of the current image.
     cur_mask = masks{i};
@@ -202,6 +206,7 @@ models = cell(num_obj_type, 1);
 % Train binary SVM classifiers for each object type.
 for i = 1:num_obj_type
     cur_model = fitcsvm(object_histograms, train_labels{i}, 'BoxConstraint', 1, 'KernelFunction', 'polynomial');
+    models{i} = cur_model;
 end
 
 % Load pre-computed segmentations of images.
@@ -223,6 +228,7 @@ test_histograms = zeros(test_num_obj, num_clusters);
 cur_object = 0;
 
 for c_i = 1:length(test_ind)
+    fprintf('Loop %3 iteration %d\n', 3, c_i);
     % Get the current image from the test set.
     i = test_ind(c_i);
     % Perform segmentations for the images in the test data.
@@ -247,10 +253,12 @@ for c_i = 1:length(test_ind)
         
         % Increment the count of the current bin for the test.
         test_histograms(cur_object_label, cur_label) = test_histograms(cur_object_label, cur_label) + 1;
+        
+        k = k + 2;
     end
     
     % Add the number of objects processed in this iteration to the counter.
-    cur_object = cur_object + length(segments{i});
+    cur_object = cur_object + numcuts(1,i);
 end
 
 % Allocate cell arrays for predictions and scores.
@@ -274,17 +282,20 @@ max_prob = zeros(test_num_obj, 1);
 type_obj = zeros(test_num_obj, 1);
 
 for i = 1:test_num_obj
-    prob_max = -1;
-    prob_max_ind = -1;
+    fprintf('Loop %4 iteration %d\n', 4, i);
+    prob_max = 0;
+    prob_max_ind = 0;
 %     sum_prob = 0;
     for j = 1:num_obj_type
-        % The probability of it being the one of the current object type.
-        cur_prob = scores{j}(i);
-        % Save the current maximum probability and its index.
-        if cur_prob > prob_max
-            cur_ind = predictions{j}(i);
-            prob_max = cur_prob;
-            prob_max_ind = j;
+        cur_l = predictions{j}(i);
+        if (cur_l == 1)
+            % The probability of it being the one of the current object type.
+            cur_prob = abs(scores{j}(i));
+            % Save the current maximum probability and its index.
+            if cur_prob > prob_max
+                prob_max = cur_prob;
+                prob_max_ind = j;
+            end
         end
         
 %         sum_prob = sum_prob + cur_prob;
@@ -303,15 +314,19 @@ prob_maps_inds = cell(length(test_ind), 1);
 segment_count = 0;
 
 for c_i = 1:length(test_ind)
+    fprintf('Loop %d iteration %d\n', 5, c_i);
     i = test_ind(c_i);
     img = images{i};
     
+    % Initialize the probability maps to the same size as the images.
     prob_maps{c_i} = zeros(size(images{i}, 1), size(images{i}, 2));
     prob_maps_inds{c_i} = zeros(size(images{i}, 1), size(images{i}, 2));
     
     segment = segments{i};
     num_cut = numcuts(1, i);
     
+    % Add the predictions and the scores to the map for each segment in the
+    % current image.
     for j = 1:num_cut
         prob_maps{c_i}(segment == j) = max_prob(segment_count + j);
         prob_maps_inds{c_i}(segment == j) = type_obj(segment_count + j);
@@ -321,13 +336,17 @@ for c_i = 1:length(test_ind)
 end
 
 % Accuracies. [test_index, object_type, (tp,fp,fn,tn)]
-accuracies = zeros(length(test_ind), num_obj_type, 4);
+accuracies = cell(length(test_ind), 1);
+for i = 1:length(test_ind)
+    accuracies{i} = zeros(num_obj_type, 4);
+end
 
 % A threshold to be trialed.
 threshold = 0.9;
 
 % Iterate through the test images.
 for c_i = 1:length(test_ind)
+    fprintf('Loop %d iteration %d\n', 6, c_i);
     % Get the current test index.
     i = test_ind(c_i);
     img = images{i};
@@ -338,7 +357,7 @@ for c_i = 1:length(test_ind)
         % Get the mask for the current image, with each instance of the
         % current object type marked as 1.
         better_mask = better_masks{i, j};
-        current_mask = (prob_maps_inds == j && prob_maps > threshold);
+        current_mask = (prob_maps_inds{c_i} == j & prob_maps{c_i} > threshold);
         
         % True positive:
         % Exists in given mask and the found mask.
@@ -353,10 +372,10 @@ for c_i = 1:length(test_ind)
         % Exists in neither masks.
         tn = sum(sum(~better_mask & ~current_mask));
         
-        accuracies(c_i, j, 1) = tp;
-        accuracies(c_i, j, 2) = fp;
-        accuracies(c_i, j, 3) = fn;
-        accuracies(c_i, j, 4) = tn;
+        accuracies{c_i}(j, 1) = tp;
+        accuracies{c_i}(j, 2) = fp;
+        accuracies{c_i}(j, 3) = fn;
+        accuracies{c_i}(j, 4) = tn;
     end
 end
 
