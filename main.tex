@@ -1,0 +1,615 @@
+
+%% bare_conf.tex
+%% V1.4b
+%% 2015/08/26
+%% by Michael Shell
+%% See:
+%% http://www.michaelshell.org/
+%% for current contact information.
+%%
+%% This is a skeleton file demonstrating the use of IEEEtran.cls
+%% (requires IEEEtran.cls version 1.8b or later) with an IEEE
+%% conference paper.
+%%
+%% Support sites:
+%% http://www.michaelshell.org/tex/ieeetran/
+%% http://www.ctan.org/pkg/ieeetran
+%% and
+%% http://www.ieee.org/
+
+%%*************************************************************************
+%% Legal Notice:
+%% This code is offered as-is without any warranty either expressed or
+%% implied; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE! 
+%% User assumes all risk.
+%% In no event shall the IEEE or any contributor to this code be liable for
+%% any damages or losses, including, but not limited to, incidental,
+%% consequential, or any other damages, resulting from the use or misuse
+%% of any information contained here.
+%%
+%% All comments are the opinions of their respective authors and are not
+%% necessarily endorsed by the IEEE.
+%%
+%% This work is distributed under the LaTeX Project Public License (LPPL)
+%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
+%% distributed and modified. A copy of the LPPL, version 1.3, is included
+%% in the base LaTeX documentation of all distributions of LaTeX released
+%% 2003/12/01 or later.
+%% Retain all contribution notices and credits.
+%% ** Modified files should be clearly indicated as such, including  **
+%% ** renaming them and changing author support contact information. **
+%%*************************************************************************
+
+
+% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
+% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
+% *** with production work. The IEEE's font choices and paper sizes can   ***
+% *** trigger bugs that do not appear when using other class files.       ***                          ***
+% The testflow support page is at:
+% http://www.michaelshell.org/tex/testflow/
+
+
+
+\documentclass[conference]{IEEEtran}
+% Some Computer Society conferences also require the compsoc mode option,
+% but others use the standard conference format.
+%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[conference]{../sty/IEEEtran}
+
+
+
+
+
+% Some very useful LaTeX packages include:
+% (uncomment the ones you want to load)
+
+
+% *** MISC UTILITY PACKAGES ***
+%
+%\usepackage{ifpdf}
+% Heiko Oberdiek's ifpdf.sty is very useful if you need conditional
+% compilation based on whether the output is pdf or dvi.
+% usage:
+% \ifpdf
+%   % pdf code
+% \else
+%   % dvi code
+% \fi
+% The latest version of ifpdf.sty can be obtained from:
+% http://www.ctan.org/pkg/ifpdf
+% Also, note that IEEEtran.cls V1.7 and later provides a builtin
+% \ifCLASSINFOpdf conditional that works the same way.
+% When switching from latex to pdflatex and vice-versa, the compiler may
+% have to be run twice to clear warning/error messages.
+
+
+
+
+
+
+
+
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\ifCLASSINFOpdf
+  % \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../pdf/}{../jpeg/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\else
+  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
+  % will default to the driver specified in the system graphics.cfg if no
+  % driver is specified.
+  % \usepackage[dvips]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../eps/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.eps}
+\fi
+% graphicx was written by David Carlisle and Sebastian Rahtz. It is
+% required if you want graphics, photos, etc. graphicx.sty is already
+% installed on most LaTeX systems. The latest version and documentation
+% can be obtained at: 
+% http://www.ctan.org/pkg/graphicx
+% Another good source of documentation is "Using Imported Graphics in
+% LaTeX2e" by Keith Reckdahl which can be found at:
+% http://www.ctan.org/pkg/epslatex
+%
+% latex, and pdflatex in dvi mode, support graphics in encapsulated
+% postscript (.eps) format. pdflatex in pdf mode supports graphics
+% in .pdf, .jpeg, .png and .mps (metapost) formats. Users should ensure
+% that all non-photo figures use a vector format (.eps, .pdf, .mps) and
+% not a bitmapped formats (.jpeg, .png). The IEEE frowns on bitmapped formats
+% which can result in "jaggedy"/blurry rendering of lines and letters as
+% well as large increases in file sizes.
+%
+% You can find documentation about the pdfTeX application at:
+% http://www.tug.org/applications/pdftex
+
+
+
+
+
+% *** MATH PACKAGES ***
+%
+%\usepackage{amsmath}
+% A popular package from the American Mathematical Society that provides
+% many useful and powerful commands for dealing with mathematics.
+%
+% Note that the amsmath package sets \interdisplaylinepenalty to 10000
+% thus preventing page breaks from occurring within multiline equations. Use:
+%\interdisplaylinepenalty=2500
+% after loading amsmath to restore such page breaks as IEEEtran.cls normally
+% does. amsmath.sty is already installed on most LaTeX systems. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/pkg/amsmath
+
+
+
+
+
+% *** SPECIALIZED LIST PACKAGES ***
+%
+%\usepackage{algorithmic}
+% algorithmic.sty was written by Peter Williams and Rogerio Brito.
+% This package provides an algorithmic environment fo describing algorithms.
+% You can use the algorithmic environment in-text or within a figure
+% environment to provide for a floating algorithm. Do NOT use the algorithm
+% floating environment provided by algorithm.sty (by the same authors) or
+% algorithm2e.sty (by Christophe Fiorio) as the IEEE does not use dedicated
+% algorithm float types and packages that provide these will not provide
+% correct IEEE style captions. The latest version and documentation of
+% algorithmic.sty can be obtained at:
+% http://www.ctan.org/pkg/algorithms
+% Also of interest may be the (relatively newer and more customizable)
+% algorithmicx.sty package by Szasz Janos:
+% http://www.ctan.org/pkg/algorithmicx
+
+
+
+
+% *** ALIGNMENT PACKAGES ***
+%
+%\usepackage{array}
+% Frank Mittelbach's and David Carlisle's array.sty patches and improves
+% the standard LaTeX2e array and tabular environments to provide better
+% appearance and additional user controls. As the default LaTeX2e table
+% generation code is lacking to the point of almost being broken with
+% respect to the quality of the end results, all users are strongly
+% advised to use an enhanced (at the very least that provided by array.sty)
+% set of table tools. array.sty is already installed on most systems. The
+% latest version and documentation can be obtained at:
+% http://www.ctan.org/pkg/array
+
+
+% IEEEtran contains the IEEEeqnarray family of commands that can be used to
+% generate multiline equations as well as matrices, tables, etc., of high
+% quality.
+
+
+
+
+% *** SUBFIGURE PACKAGES ***
+%\ifCLASSOPTIONcompsoc
+%  \usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+%\else
+%  \usepackage[caption=false,font=footnotesize]{subfig}
+%\fi
+% subfig.sty, written by Steven Douglas Cochran, is the modern replacement
+% for subfigure.sty, the latter of which is no longer maintained and is
+% incompatible with some LaTeX packages including fixltx2e. However,
+% subfig.sty requires and automatically loads Axel Sommerfeldt's caption.sty
+% which will override IEEEtran.cls' handling of captions and this will result
+% in non-IEEE style figure/table captions. To prevent this problem, be sure
+% and invoke subfig.sty's "caption=false" package option (available since
+% subfig.sty version 1.3, 2005/06/28) as this is will preserve IEEEtran.cls
+% handling of captions.
+% Note that the Computer Society format requires a larger sans serif font
+% than the serif footnote size font used in traditional IEEE formatting
+% and thus the need to invoke different subfig.sty package options depending
+% on whether compsoc mode has been enabled.
+%
+% The latest version and documentation of subfig.sty can be obtained at:
+% http://www.ctan.org/pkg/subfig
+
+
+
+
+% *** FLOAT PACKAGES ***
+%
+%\usepackage{fixltx2e}
+% fixltx2e, the successor to the earlier fix2col.sty, was written by
+% Frank Mittelbach and David Carlisle. This package corrects a few problems
+% in the LaTeX2e kernel, the most notable of which is that in current
+% LaTeX2e releases, the ordering of single and double column floats is not
+% guaranteed to be preserved. Thus, an unpatched LaTeX2e can allow a
+% single column figure to be placed prior to an earlier double column
+% figure.
+% Be aware that LaTeX2e kernels dated 2015 and later have fixltx2e.sty's
+% corrections already built into the system in which case a warning will
+% be issued if an attempt is made to load fixltx2e.sty as it is no longer
+% needed.
+% The latest version and documentation can be found at:
+% http://www.ctan.org/pkg/fixltx2e
+
+
+%\usepackage{stfloats}
+% stfloats.sty was written by Sigitas Tolusis. This package gives LaTeX2e
+% the ability to do double column floats at the bottom of the page as well
+% as the top. (e.g., "\begin{figure*}[!b]" is not normally possible in
+% LaTeX2e). It also provides a command:
+%\fnbelowfloat
+% to enable the placement of footnotes below bottom floats (the standard
+% LaTeX2e kernel puts them above bottom floats). This is an invasive package
+% which rewrites many portions of the LaTeX2e float routines. It may not work
+% with other packages that modify the LaTeX2e float routines. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/pkg/stfloats
+% Do not use the stfloats baselinefloat ability as the IEEE does not allow
+% \baselineskip to stretch. Authors submitting work to the IEEE should note
+% that the IEEE rarely uses double column equations and that authors should try
+% to avoid such use. Do not be tempted to use the cuted.sty or midfloat.sty
+% packages (also by Sigitas Tolusis) as the IEEE does not format its papers in
+% such ways.
+% Do not attempt to use stfloats with fixltx2e as they are incompatible.
+% Instead, use Morten Hogholm'a dblfloatfix which combines the features
+% of both fixltx2e and stfloats:
+%
+% \usepackage{dblfloatfix}
+% The latest version can be found at:
+% http://www.ctan.org/pkg/dblfloatfix
+
+
+
+
+% *** PDF, URL AND HYPERLINK PACKAGES ***
+%
+%\usepackage{url}
+% url.sty was written by Donald Arseneau. It provides better support for
+% handling and breaking URLs. url.sty is already installed on most LaTeX
+% systems. The latest version and documentation can be obtained at:
+% http://www.ctan.org/pkg/url
+% Basically, \url{my_url_here}.
+
+
+
+
+% *** Do not adjust lengths that control margins, column widths, etc. ***
+% *** Do not use packages that alter fonts (such as pslatex).         ***
+% There should be no need to do such things with IEEEtran.cls V1.6 and later.
+% (Unless specifically asked to do so by the journal or conference you plan
+% to submit to, of course. )
+
+
+% Use UTF-8 encoding for our petty Turkish names.
+\usepackage[utf8]{inputenc}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[]{algorithm2e}
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\newcommand{\secondsection}{Feature extraction using dense sampling}
+
+\newcommand{\thirdsection}{Creating the codebooks}
+
+\newcommand{\fourthsection}{Training binary classifiers}
+
+\newcommand{\fifthsection}{Image segmentation}
+
+\newcommand{\sixthsection}{Probability maps and evaluation}
+
+
+\begin{document}
+%
+% paper title
+% Titles are generally capitalized except for words such as a, an, and, as,
+% at, but, by, for, in, nor, of, on, or, the, to and up, which are usually
+% not capitalized unless they are the first or last word of the title.
+% Linebreaks \\ can be used within to get better formatting as desired.
+% Do not put math or special symbols in the title.
+\title{CS484 - Image Analysis\\ Project Report}
+
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+\author{\IEEEauthorblockN{Özgür Taşlık}
+\IEEEauthorblockA{Department of Computer Engineering\\
+Bilkent University\\
+Ankara, Turkey \\
+ozgur.taslik@ug.bilkent.edu.tr}
+\and
+\IEEEauthorblockN{Çağdaş Öztekin}
+\IEEEauthorblockA{Department of Computer Engineering\\
+Bilkent University\\
+Ankara, Turkey \\
+cagdas.oztekin@ug.bilkent.edu.tr}}
+
+% conference papers do not typically use \thanks and this command
+% is locked out in conference mode. If really needed, such as for
+% the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
+% after \documentclass
+
+% for over three affiliations, or if they all won't fit within the width
+% of the page, use this alternative format:
+% 
+%\author{\IEEEauthorblockN{Michael Shell\IEEEauthorrefmark{1},
+%Homer Simpson\IEEEauthorrefmark{2},
+%James Kirk\IEEEauthorrefmark{3}, 
+%Montgomery Scott\IEEEauthorrefmark{3} and
+%Eldon Tyrell\IEEEauthorrefmark{4}}
+%\IEEEauthorblockA{\IEEEauthorrefmark{1}School of Electrical and Computer Engineering\\
+%Georgia Institute of Technology,
+%Atlanta, Georgia 30332--0250\\ Email: see http://www.michaelshell.org/contact.html}
+%\IEEEauthorblockA{\IEEEauthorrefmark{2}Twentieth Century Fox, Springfield, USA\\
+%Email: homer@thesimpsons.com}
+%\IEEEauthorblockA{\IEEEauthorrefmark{3}Starfleet Academy, San Francisco, California 96678-2391\\
+%Telephone: (800) 555--1212, Fax: (888) 555--1212}
+%\IEEEauthorblockA{\IEEEauthorrefmark{4}Tyrell Inc., 123 Replicant Street, Los Angeles, California 90210--4321}}
+
+
+
+
+% use for special paper notices
+%\IEEEspecialpapernotice{(Invited Paper)}
+
+
+
+
+% make the title area
+\maketitle
+
+% As a general rule, do not put math, special symbols or citations
+% in the abstract
+\begin{abstract}
+Object recognition is a difficult problem and with the rapid growth of image data, it is impossible for objects in images to be manually labeled. In this project, we attempted to detect and classify objects using the bag-of-words method. We used dense sampling to create visual words and kmeans clustering to create a codebook for already labeled objects. And we attempted to classify segments of images in our test set using binary support vector machine classifiers on the basis of their codebooks. \\
+
+\indent Keywords\\
+\indent Computer vision, object recognition, bag-of-words
+\end{abstract}
+
+% no keywords
+
+
+\section{Introduction}
+% no \IEEEPARstart
+% You must have at least 2 lines in the paragraph with the drop letter
+% (should never be an issue)
+
+In this project, our goal was to recognize objects in images using the bag-of-words model. First, we densely sampled our visual words from grids that were 10 pixels apart using Scale-invariant feature transform (SIFT)\cite{sift}. We extracted approximately \textbf{420,000} descriptors from \textbf{188} images. A more detailed discussion on feature extraction can be found in the second section, titled \textbf{\secondsection}. 
+
+In the next step, we clustered the descriptors, in other words the visual words, in 500 clusters, using \textit{k}-means clustering\cite{kmeans-matlab} and created a codebook of words for each instance of an object in our training set. This part will be discussed in the third section titled \textbf{\thirdsection}. 
+
+Consequentially, we trained binary support vector machine (SVM) classifiers for each object type in our training set, using the histograms of the visual words. As will be explained in more detail in the fourth section, \textbf{\fourthsection}, each bin in the histogram corresponded to a cluster from the previous step and the descriptors in these bins came from the given object. As the result of this step, we obtained \textbf{8} binary SVM classifiers, for 8 types of objects. 
+
+In the next step, we first performed segmentation on the images in our test set, then, similar to the previous step, created histograms for each segment and attempted to predict the object type using the SVM classifiers, and assigned to it the class with the highest score. The result of this step was a probability map for each pixel in the images in the test set, whose probabilities came from the SVM classifiers' confidence of the corresponding segment's object type prediction. The segmentation of the images will be explained in more detail in the fifth section, \textbf{\fifthsection} followed by the sixth section, \textbf{\sixthsection} where we will talk about the probability maps and how we evaluated our project.
+
+\section{\secondsection}
+
+Our goal in this part was to extract features from the images, which could be later used in training models for object types and testing segments from the images to classify as objects. We used a method called dense sampling, chose the pixels from where the SIFT descriptors would come uniformly, on a regular grid. We used VLFeat's Dense SIFT implementation\cite{vlfeat-dsift}, which follows the dense sampling approach and extracts SIFT descriptors from an image with regular intervals between the grid positions. DSift function had two parameters, \textbf{size} and \textbf{step}. We used the default value, \textbf{8} for size, so that our SIFT descriptors would be vectors of length \textbf{128}. We tried several values for the step value, eventually picked \textbf{10}, which extracted a total of \textbf{424,652} SIFT descriptors from 188 images. In our data set, the images from 1 to 49, of size $256 \times 256$ each had 576 descriptors while the images from 50 to 188, of size $480 \times 640$ each had 2852 descriptors. 
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.2\textwidth]{images/1.jpg}
+    \includegraphics[width=0.2\textwidth]{images/dense_sampling.png}
+    \caption{Original image from the data set on the left, and the grid positions when extracting SIFT descriptors on the right}
+    \label{fig:my_label}
+\end{figure}
+
+Our main concerns while extracting features was to find a good step value so that we would have sufficiently many descriptors in total while avoiding having too many descriptors lest we have memory issues and a bad runtime performance.
+
+\section{\thirdsection}
+
+In this step, we clustered the SIFT descriptors. We used MATLAB's \textit{k}-means implementation\cite{kmeans-matlab} and had 500 clusters. Although we could opt for a larger number of clusters, our realization of the codebooks for individual objects being sparsely populated made us choose \textbf{500}, rather than 1000 or 2000.
+
+\begin{table}[!h]
+\caption{The distribution of visual words to the clusters}
+\label{table_example}
+\centering
+\begin{tabular}{|c||c|}
+\hline
+Cluster labels & Number of visual words\\
+\hline
+1-100 & 90,973 \\
+\hline
+101-200 & 79,273 \\
+\hline
+201-300 & 84,601 \\
+\hline
+301-400 & 85,377 \\
+\hline
+401-500 & 84,428 \\
+\hline
+\end{tabular}
+\end{table}
+
+We observed that number of visual words in the clusters did not deviate greatly, which means that dense sampling had successfully obtained generalized features from the data set. We have found that, on the average, \textbf{450.36} bins in the histograms of the objects in the training set were empty, which means that only less than \bm{$10\%$} of the bins in the histograms were occupied. And we have also found that an object in the training set, had only \textbf{124.18} descriptors. In the light of these findings, we hope our decision to pick a rather smaller number of clusters is more clear.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/img1hist.png}
+    \caption{A histogram for the first image in the data set, showing the number of descriptors in its histogram's bins.}
+    \label{fig:my_label}
+\end{figure}
+
+\section{\fourthsection}
+
+As mentioned earlier but not explained, we divided our data set into two halves, one being the training set and the other being the test set. We used MATLAB's dividerand\cite{dividerand} function to achieve this and passed the ratios for the two sets as \textbf{0.5}. After completing the third step, as we had our histograms for each instance of an object in the training set our data was ready for training. But not before we created 8 vectors of binary labels. We filled in the label vectors using the masks cell array, matching the names of classes to a list of indices we created in order to use as a lookup table. We labeled positive examples of a class in a given label vector as 1, and the negative examples as -1. In total, we trained 8 different binary SVM classifiers, each with the same training data but with respective training labels. We used MATLAB's own SVM library\cite{matlab-svm}.
+
+\section{\fifthsection}
+
+Before proceeding to test our models we first had to create meaningful segments from the images in the test set. Knowing that segmentation is a difficult problem, and takes a lot of runtime, we had performed the segmentation before doing the other parts. We used the normalized cut code that was recommended in the assignment sheet\cite{ncut}, which had its flaws too, a line of code where the eigenvalues were computed had to be changed.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.27\textwidth]{images/1.jpg} \\
+    \includegraphics[width=0.4\textwidth]{images/seg1.png} \\
+    \includegraphics[width=0.4\textwidth]{images/seg2.png} \\
+    \includegraphics[width=0.4\textwidth]{images/seg3.png} \\
+    \caption{The original image on the top, the following images belong to the first, the second and the third segments respectively, depicted in white.}
+    \label{fig:my_label}
+\end{figure}
+
+As for how many segments we wanted to obtain from the images, we decided manually, by inspecting each image, number of cuts for each respective image can be found in \textbf{numcuts.mat} file in the compressed file. However, most of the segmentation results had much fewer segments than the parameter that was passed to the function, and we simply did not have the time to rerun the segmentation function for such images as performing the segmentation once for all the images took nearly 7 hours on Cagdas's computer. 
+
+Our main concerns at this step was first to obtain meaningful segments, such as if there is a building in the image, obtain the whole of the building and nothing else in one segment. But the results were nowhere near that. We think that part of the reason for the accuracies to be low is that our segments turned out to be too large, encapsulating many visual words and therefore making it harder for our classifiers to predict a distinct class for the segments. That is also possibly why, the scores in the probability maps in the later section are quite low.
+
+The segmentation results can be found in the file named \textbf{segments.mat} in the compressed file. We also read in the segmentation results, the labels for each pixels from the same file that we pre-computed, to alleviate the runtime.
+
+\section{\sixthsection}
+
+In this step we ran our classifiers on the test set. One remark is that, the total number of objects in the entire data set is \textbf{544}, and as we divide the data set in two halves randomly, we observed that the number of objects in our training set was usually around \textbf{270}. In the particular run I will be talking about in this section, we had \textbf{271} examples in the training set. That should naturally leave \textbf{273} objects in the test set, however, we had \textbf{2050} segments in total, in the images in the test set. 
+
+\begin{algorithm}[!h]
+ \KwData{Object histograms for each segment in the test set}
+ \KwResult{Probability maps for each image and class}
+ \For{each histogram \textbf{h} in the test set}{
+   \Comment{\# Initialize max score and its index to 0}\\
+    max\_score \leftarrow 0\\
+    max\_score\_index \leftarrow 0\\
+    \For{each binary classifier \textbf{c}}{
+        [score, prediction] \leftarrow predict(c, h)\; \\
+        \If{prediction = 1 \& score $>$ max\_score}{
+            max\_score \leftarrow score\\
+            max\_score\_ind \leftarrow index\_of\_c\\
+        }
+    }
+    \# Assign the corresponding pixels with the score and class index \\
+    prob\_maps \leftarrow max\_score \\
+    prob\_maps\_inds \leftarrow max\_score\_ind \\
+  }
+ \caption{Our algorithm to create the probability maps, see the relevant part in our code for clarity}
+\end{algorithm}
+
+In testing, we tried to predict each segment with all of the 8 binary classifiers, and we said that the among the classifiers that say the given segment is an example of the positive class, we considered the classification with the highest score. We had initialized probabiltiy maps with zeros, whose size are the same as the image they correspond to. We had a probability map for each image and each class, during the testing of each segment, we updated pixels in the probability map that belonged to that segment with the classification score obtained for that image and that class.
+
+As the scores from SVM's predictions differed too much, some being values between 0 and 1 but some being over 100, we did not apply a threshold when finding our confusion matrix, and as a result we do not have an ROC curve, but rather a confusion matrix as a result of accepting anything with a score greater than \textbf{0.9} as positive.
+
+\begin{table}[!h]
+\caption{The confusion matrix for each class, true positives, false positives, false negatives and true negatives in the order of columns, with the scores thresholded by \textbf{0.9}.}
+\label{table_example}
+\centering
+\begin{tabular}{||c|c|c|c|c||}
+\hline
+Class & TP & FP & FN & TN \\
+\hline
+Screen & 286,659 & 2,994,407 & 786,161 & 18,526,309 \\
+\hline
+Keyboard & 0 & 0 & 703,722 & 21,889,814 \\
+\hline
+Mouse & 0 & 110,787 & 48,819 & 22,433,930 \\
+\hline
+Mug & 0 & 198,517 & 77,180 & 22,317,839 \\
+\hline
+Car & 4,983 & 173,210 & 135,668 & 22,279,675 \\
+\hline
+Tree & 16,537 & 33,501 & 668,673 & 21,874,825 \\
+\hline
+Person & 39 & 221,986 & 28,011 & 22,343,500 \\
+\hline
+Building & 1,466,606 & 14,679,762 & 281,482 & 6,165,686 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\caption{The confusion matrix for each class, true positives, false positives, false negatives and true negatives in the order of columns, with the scores thresholded by \textbf{50}.}
+\label{table_example}
+\centering
+\begin{tabular}{||c|c|c|c|c||}
+\hline
+Class & TP & FP & FN & TN \\
+\hline
+Screen & 286,659 & 2,994,407 & 786,161 & 18,526,309 \\
+\hline
+Keyboard & 0 & 0 & 703,722 & 21,889,814 \\
+\hline
+Mouse & 0 & 110,787 & 48,819 & 22,433,930 \\
+\hline
+Mug & 0 & 74,942 & 77,180 & 22,441,414 \\
+\hline
+Car & 0 & 0 & 140,651 & 22,452,885 \\
+\hline
+Tree & 0 & 0 & 685,210 & 21,908,326 \\
+\hline
+Person & 0 & 78,630 & 28,050 & 22,486,856 \\
+\hline
+Building & 1,466,606 & 14,679,762 & 281,482 & 6,165,686 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[!h]
+\caption{Precision, recall and accuracy for each class, when the threshold values is \textbf{0.9}}
+\label{table_example}
+\centering
+\begin{tabular}{||c|c|c|c|c||}
+\hline
+Class & Precision & Recall & Accuracy \\
+\hline 
+Screen & 0.087 & 0.267 & 0.832 \\
+\hline
+Keyboard & 0 & 0 & 0.968 \\
+\hline
+Mouse & 0 & 0 & 0.992 \\
+\hline
+Mug & 0 & 0 & 0.987 \\
+\hline
+Car & 0.027 & 0.035 & 0.986 \\
+\hline
+Tree & 0.330 & 0.024 & 0.68 \\
+\hline
+Person & 0 & 0.001 & 0.988 \\
+\hline
+Building & 0.090 & 0.843 & 0.337 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Conclusion}
+
+In conclusion, our model was simply awful. We could possibly achieve better precision and recall by just randomly guessing. In our defense, our segmentation code took a very long time, we did not have quite a long time to go through the segmentation process and obtain meaningful segments, that we think would drastically change our results. 
+
+
+\begin{thebibliography}{20}
+
+
+\bibitem{sift}
+Lowe, David G. "Object recognition from local scale-invariant features." \textit{Computer vision, 1999. The proceedings of the seventh IEEE international conference on.} Vol. 2. Ieee, 1999.
+
+\bibitem{kmeans-matlab} k-means clustering - MATLAB. \\
+"https://www.mathworks.com/help/stats/kmeans.html", Accessed January 11, 2017.
+  
+\bibitem{vlfeat-dsift} VLFeat - Tutorials > Dense SIFT. \\
+"http://www.vlfeat.org/overview/dsift.html", Accessed January 11, 2017.
+
+\bibitem{dividerand} Divide targets into three sets using random indices - MATLAB. \\
+"https://www.mathworks.com/help/nnet/ref/dividerand.html", Accessed January 11, 2017.
+
+\bibitem{matlab-svm} Train support vector machine classifier - MATLAB. \\
+"https://www.mathworks.com/help/stats/svmtrain.html", Accessed January 11, 2017.
+
+\bibitem{ncut} Normalized Cuts Segmentation Code, for MATLAB. \\
+"http://www.timotheecour.com/software/ncut/ncut.html", January 11, 2017.
+
+\end{thebibliography}
+
+\section*{Appendix}
+
+We did everything in intimate and equal collaboration.
+
+
+% that's all folks
+\end{document}
+
+
