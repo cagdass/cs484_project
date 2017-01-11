@@ -91,7 +91,7 @@ for i = 1:num_img
                     break
                 end
             end
-            better_masks{i, cur_index} = better_masks{i, cur_index} || cur(j).mask;
+            better_masks{i, cur_index} = (better_masks{i, cur_index} | cur(j).mask);
             train_object_total(cur_index) = train_object_total(cur_index) + 1;
             train_num_obj = train_num_obj + 1;
         end
@@ -206,13 +206,15 @@ end
 
 % Load pre-computed segmentations of images.
 segments = load('segments.mat');
+segments = segments.segments;
 % Load the number of segments for each image.
 numcuts = load('numcuts.mat');
+numcuts = numcuts.num_cuts;
 
 % Number of test objects, init to 0.
 test_num_obj = 0;
 for i = 1:length(test_ind)
-    test_num_obj = test_num_obj + numcuts(test_ind(i));
+    test_num_obj = test_num_obj + numcuts(1, test_ind(i));
 end
 
 % Test histograms
@@ -298,7 +300,25 @@ prob_maps = cell(length(test_ind), 1);
 % The types of objects that each segment is classified as.
 prob_maps_inds = cell(length(test_ind), 1);
 
+segment_count = 0;
 
+for c_i = 1:length(test_ind)
+    i = test_ind(c_i);
+    img = images{i};
+    
+    prob_maps{c_i} = zeros(size(images{i}, 1), size(images{i}, 2));
+    prob_maps_inds{c_i} = zeros(size(images{i}, 1), size(images{i}, 2));
+    
+    segment = segments{i};
+    num_cut = numcuts(1, i);
+    
+    for j = 1:num_cut
+        prob_maps{c_i}(segment == j) = max_prob(segment_count + j);
+        prob_maps_inds{c_i}(segment == j) = type_obj(segment_count + j);
+    end
+    
+    segment_count = segment_count + num_cut;
+end
 
 % Accuracies. [test_index, object_type, (tp,fp,fn,tn)]
 accuracies = zeros(length(test_ind), num_obj_type, 4);
