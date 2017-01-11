@@ -1,5 +1,5 @@
 % Number of images in the data set.
-num_img = 20;
+num_img = 188;
 
 % Will keep the count of total number of objects.
 num_obj = 0;
@@ -19,6 +19,9 @@ num_clusters = 500;
 images = cell(num_img,1);
 % Masks in the data set.
 masks = cell(num_img,1);
+% Better masks for future usage, putting together separate instance of the same object type.
+better_masks = cell(num_img, num_obj_type);
+
 frames = cell(num_img,1);
 
 % Descriptors for each image.
@@ -57,6 +60,13 @@ for i = 1:num_img
     masks{i} = load(strcat('data/', num2str(i), '.mat'));
     % Read the images.
     images{i} = imread(strcat('data/', num2str(i), '.jpg'));
+    
+    % Initialize the indices of the better masks to zero.
+    % They are to be orred with the given masks.
+    for j = 1:num_obj_type
+        better_masks{i,j} = false(size(images{i}, 1), size(images{i}, 2));
+    end
+    
     % Convert image to grayscale before applying DSIFT.
     tmp_im = single(rgb2gray(images{i}));
     % Apply SIFT using dense sampling with parameters defined above.
@@ -81,6 +91,7 @@ for i = 1:num_img
                     break
                 end
             end
+            better_masks{i, cur_index} = better_masks{i, cur_index} || cur(j).mask;
             train_object_total(cur_index) = train_object_total(cur_index) + 1;
             train_num_obj = train_num_obj + 1;
         end
@@ -154,6 +165,9 @@ for c_i = 1:length(train_ind)
         cur_counts(cur_index) = cur_counts(cur_index) + 1;
         cur_obj_count = cur_obj_count + 1;
         
+        for t = 1:num_obj_type
+            train_labels{t}(cur_obj_count) = -1;
+        end
         % Mark the corresponding class name's label as 1 for the current
         % object.
         train_labels{cur_index}(cur_obj_count) = 1;
@@ -190,5 +204,139 @@ for i = 1:num_obj_type
     cur_model = fitcsvm(object_histograms, train_labels{i}, 'BoxConstraint', 1, 'KernelFunction', 'polynomial');
 end
 
-% Predict a given test example
-[label, score] = predict(cur_model, object_histograms(13:24);
+% Load pre-computed segmentations of images.
+segments = load('segments.mat');
+% Load the number of segments for each image.
+numcuts = load('numcuts.mat');
+
+% Number of test objects, init to 0.
+test_num_obj = 0;
+for i = 1:length(test_ind)
+    test_num_obj = test_num_obj + numcuts(test_ind(i));
+end
+
+% Test histograms
+test_histograms = zeros(test_num_obj, num_clusters);
+% Counter for object index.
+cur_object = 0;
+
+for c_i = 1:length(test_ind)
+    % Get the current image from the test set.
+    i = test_ind(c_i);
+    % Perform segmentations for the images in the test data.
+    % [SegLabel,NcutDiscrete,NcutEigenvectors,NcutEigenvalues,W,imageEdges]= NcutImage(images{c_i},length(masks{i}.masks));
+    
+    % Indices of the descriptors for the current image.
+    cur_frame = frames{i};
+    
+    % Base index for the first descriptor in this image.
+    base_index = sum(descriptor_counts(1:i-1));
+    
+    % Iterate through this image's descriptors.
+    k = 1;
+    while k < descriptor_counts(i)
+        x = cur_frame(k);
+        y = cur_frame(k+1);
+        
+        cur_label = labels(base_index + k);
+        
+        % Find the index for the current object.
+        cur_object_label = cur_object + segments{i}(x, y);
+        
+        % Increment the count of the current bin for the test.
+        test_histograms(cur_object_label, cur_label) = test_histograms(cur_object_label, cur_label) + 1;
+    end
+    
+    % Add the number of objects processed in this iteration to the counter.
+    cur_object = cur_object + length(segments{i});
+end
+
+% Allocate cell arrays for predictions and scores.
+predictions = cell(num_obj_type, 1);
+scores = cell(num_obj_type, 1);
+for i = 1:num_obj_type
+    predictions{i} = zeros(test_num_obj, 1);
+    scores{i} = zeros(test_num_obj, 1);
+end
+
+% Predict the labels for the given test objects.
+for i = 1:num_obj_type
+    [label, score] = predict(models{i}, test_histograms);
+    predictions{i} = label;
+    scores{i} = score;
+end
+
+% Compute the probability maps for each segment.
+max_prob = zeros(test_num_obj, 1);
+% Object type from where the maximum score comes.
+type_obj = zeros(test_num_obj, 1);
+
+for i = 1:test_num_obj
+    prob_max = -1;
+    prob_max_ind = -1;
+%     sum_prob = 0;
+    for j = 1:num_obj_type
+        % The probability of it being the one of the current object type.
+        cur_prob = scores{j}(i);
+        % Save the current maximum probability and its index.
+        if cur_prob > prob_max
+            cur_ind = predictions{j}(i);
+            prob_max = cur_prob;
+            prob_max_ind = j;
+        end
+        
+%         sum_prob = sum_prob + cur_prob;
+    end
+    
+    % Update the maximum confidence and the object type that it belongs to.
+    max_prob(i) = prob_max;
+    type_obj(i) = prob_max_ind;
+end
+
+% Probability maps for all test images.
+prob_maps = cell(length(test_ind), 1);
+% The types of objects that each segment is classified as.
+prob_maps_inds = cell(length(test_ind), 1);
+
+
+
+% Accuracies. [test_index, object_type, (tp,fp,fn,tn)]
+accuracies = zeros(length(test_ind), num_obj_type, 4);
+
+% A threshold to be trialed.
+threshold = 0.9;
+
+% Iterate through the test images.
+for c_i = 1:length(test_ind)
+    % Get the current test index.
+    i = test_ind(c_i);
+    img = images{i};
+    
+    % Iterate through object types.
+    % The accuracies for each one will be calculated separately.
+    for j = 1:num_obj_type
+        % Get the mask for the current image, with each instance of the
+        % current object type marked as 1.
+        better_mask = better_masks{i, j};
+        current_mask = (prob_maps_inds == j && prob_maps > threshold);
+        
+        % True positive:
+        % Exists in given mask and the found mask.
+        tp = sum(sum(better_mask & current_mask));
+        % False positive:
+        % Not in the given mask but in the found mask.
+        fp = sum(sum(~better_mask & current_mask));
+        % False negative:
+        % In the given mask but not in the found mask.
+        fn = sum(sum(better_mask & ~current_mask));
+        % True negative:
+        % Exists in neither masks.
+        tn = sum(sum(~better_mask & ~current_mask));
+        
+        accuracies(c_i, j, 1) = tp;
+        accuracies(c_i, j, 2) = fp;
+        accuracies(c_i, j, 3) = fn;
+        accuracies(c_i, j, 4) = tn;
+    end
+end
+
